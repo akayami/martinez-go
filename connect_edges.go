@@ -55,26 +55,42 @@ func NextPos(pos int, resultEvents []*SweepEvent, processed map[int]bool, origPo
 // 	return newPos
 // }
 
-// InitializeContourFromContext initializes a contour from the sweep event context.
 func InitializeContourFromContext(event *SweepEvent, contours []*Contour, contourId int) *Contour {
-	contour := NewContour(contourId)
+	contour := &Contour{}
+
 	if event.PrevInResult != nil {
-		lowerContourId := event.PrevInResult.OutputContourId
-		lowerContour := contours[lowerContourId]
-		if lowerContour.HoleOf != nil {
-			parentContourId := lowerContour.HoleOf.Id
-			contours[parentContourId].HoleIds = append(contours[parentContourId].HoleIds, contourId)
-			contour.HoleOf = contours[parentContourId]
-			contour.Depth = lowerContour.Depth
+		prevInResult := event.PrevInResult
+		lowerContourId := prevInResult.OutputContourId
+		lowerResultTransition := prevInResult.ResultTransition
+
+		if lowerResultTransition > 0 {
+			lowerContour := contours[lowerContourId]
+			if lowerContour.HoleOf != nil {
+				// The lower contour is a hole => Connect the new contour as a hole to its parent,
+				// and use the same depth.
+				parentContourId := lowerContour.HoleOf.Id
+				contours[parentContourId].HoleIds = append(contours[parentContourId].HoleIds, contourId)
+				contour.HoleOf = contours[parentContourId]
+				contour.Depth = lowerContour.Depth
+			} else {
+				// The lower contour is an exterior contour => Connect the new contour as a hole,
+				// and increment depth.
+				contours[lowerContourId].HoleIds = append(contours[lowerContourId].HoleIds, contourId)
+				contour.HoleOf = lowerContour
+				contour.Depth = lowerContour.Depth + 1
+			}
 		} else {
-			lowerContour.HoleIds = append(lowerContour.HoleIds, contourId)
-			contour.HoleOf = lowerContour
-			contour.Depth = lowerContour.Depth + 1
+			// We are outside => this contour is an exterior contour of same depth.
+			contour.HoleOf = nil
+			contour.Depth = contours[lowerContourId].Depth
 		}
 	} else {
+		// There is no lower/previous contour => this contour is an exterior contour of depth 0.
 		contour.HoleOf = nil
 		contour.Depth = 0
 	}
+
+	contour.Id = contourId
 	return contour
 }
 
