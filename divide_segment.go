@@ -10,8 +10,8 @@ func DivideSegment(se *SweepEvent, p Point, queue TinyQueue) {
 		// fmt.Println("Warning: Collapsed segment detected", se)
 	}
 	// Looks like useless statement
-	// r.ContourId = se.ContourId
-	// l.ContourId = se.ContourId
+	r.ContourId = se.ContourId
+	l.ContourId = se.ContourId
 
 	// Avoid a rounding error. The left event would be processed after the right event
 	if CompareEvents(l, se.OtherEvent) == 1 {

@@ -2,7 +2,9 @@ package martinez_go
 
 // PossibleIntersection checks for a possible intersection between two sweep events.
 func PossibleIntersection(se1, se2 *SweepEvent, queue TinyQueue) int {
-	inter, nintersections := SegmentIntersection(se1.Point, se1.OtherEvent.Point, se2.Point, se2.OtherEvent.Point, false)
+	inter := SegmentIntersection(se1.Point, se1.OtherEvent.Point, se2.Point, se2.OtherEvent.Point, false)
+
+	nintersections := len(inter)
 
 	if nintersections == 0 {
 		return 0 // No intersection
@@ -28,10 +30,17 @@ func PossibleIntersection(se1, se2 *SweepEvent, queue TinyQueue) int {
 		return 1
 	}
 
-	// Handle overlapping line segments
-	events := []*SweepEvent{}
+	return processOverlap(se1, se2, queue)
+}
+
+// Example implementation of the logic.
+func processOverlap(se1, se2 *SweepEvent, queue TinyQueue) int {
+	var events []*SweepEvent
+	leftCoincide := false
+	rightCoincide := false
+
 	if Equals(se1.Point, se2.Point) {
-		events = append(events, se2, se1)
+		leftCoincide = true // linked
 	} else if CompareEvents(se1, se2) == 1 {
 		events = append(events, se2, se1)
 	} else {
@@ -39,22 +48,25 @@ func PossibleIntersection(se1, se2 *SweepEvent, queue TinyQueue) int {
 	}
 
 	if Equals(se1.OtherEvent.Point, se2.OtherEvent.Point) {
-		events = append(events, se2.OtherEvent, se1.OtherEvent)
+		rightCoincide = true
 	} else if CompareEvents(se1.OtherEvent, se2.OtherEvent) == 1 {
 		events = append(events, se2.OtherEvent, se1.OtherEvent)
 	} else {
 		events = append(events, se1.OtherEvent, se2.OtherEvent)
 	}
 
-	leftCoincide := Equals(se1.Point, se2.Point)
-	rightCoincide := Equals(se1.OtherEvent.Point, se2.OtherEvent.Point)
-
-	if leftCoincide && rightCoincide {
+	if (leftCoincide && rightCoincide) || leftCoincide {
+		// both line segments are equal or share the left endpoint
 		se2.Type = NonContributing
 		if se2.InOut == se1.InOut {
 			se1.Type = SameTransition
 		} else {
 			se1.Type = DifferentTransition
+		}
+
+		if leftCoincide && !rightCoincide {
+			// Fixes the overlapping self-intersecting polygons issue
+			DivideSegment(events[1].OtherEvent, events[0].Point, queue)
 		}
 		return 2
 	}
@@ -74,5 +86,6 @@ func PossibleIntersection(se1, se2 *SweepEvent, queue TinyQueue) int {
 	// One line segment fully includes the other
 	DivideSegment(events[0], events[1].Point, queue)
 	DivideSegment(events[3].OtherEvent, events[2].Point, queue)
+
 	return 3
 }

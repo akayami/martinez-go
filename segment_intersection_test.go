@@ -36,7 +36,7 @@ func TestIntersection(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		got, _ := SegmentIntersection(tt.a1, tt.a2, tt.b1, tt.b2, tt.noEndpointTouch)
+		got := SegmentIntersection(tt.a1, tt.a2, tt.b1, tt.b2, tt.noEndpointTouch)
 		if !pointsEqual(got, tt.want) {
 			t.Errorf("PossibleIntersection(%v, %v, %v, %v, %v) = %v, want %v", tt.a1, tt.a2, tt.b1, tt.b2, tt.noEndpointTouch, got, tt.want)
 		}

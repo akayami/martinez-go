@@ -10,7 +10,7 @@ type TinyQueueDefault struct {
 
 // NewTinyQueueDefault creates a new instance of TinyQueueDefault
 // It takes an optional slice of data and a compare function.
-func NewTinyQueueDefault(data []*SweepEvent, compare SweepEventComparator) *TinyQueueDefault {
+func NewTinyQueueDefault2(data []*SweepEvent, compare SweepEventComparator) *TinyQueueDefault {
 	if compare == nil {
 		compare = defaultCompare
 	}
@@ -104,4 +104,86 @@ type TinyQueue interface {
 	Push(*SweepEvent)
 	Pop() *SweepEvent
 	Peek() *SweepEvent
+}
+
+type TinyQueueAI struct {
+	data    []*SweepEvent
+	compare func(a, b *SweepEvent) int
+}
+
+func NewTinyQueueDefault(data []*SweepEvent, compare func(a, b *SweepEvent) int) *TinyQueueAI {
+	if compare == nil {
+		compare = CompareEvents // Assuming CompareEvents is defined as per your provided context
+	}
+	tq := &TinyQueueAI{data: data, compare: compare}
+	if len(data) > 0 {
+		for i := (len(data) >> 1) - 1; i >= 0; i-- {
+			tq.down(i)
+		}
+	}
+	return tq
+}
+
+func (tq *TinyQueueAI) Len() int {
+	return len(tq.data)
+}
+
+func (tq *TinyQueueAI) Push(item *SweepEvent) {
+	tq.data = append(tq.data, item)
+	tq.up(len(tq.data) - 1)
+}
+
+func (tq *TinyQueueAI) Pop() *SweepEvent {
+	if len(tq.data) == 0 {
+		return nil
+	}
+	top := tq.data[0]
+	if len(tq.data)-1 > 0 {
+		tq.data[0] = tq.data[len(tq.data)-1]
+		tq.down(0)
+	}
+	tq.data = tq.data[:len(tq.data)-1]
+	return top
+}
+
+func (tq *TinyQueueAI) Peek() *SweepEvent {
+	if len(tq.data) == 0 {
+		return nil
+	}
+	return tq.data[0]
+}
+
+func (tq *TinyQueueAI) up(pos int) {
+	item := tq.data[pos]
+	for pos > 0 {
+		parent := (pos - 1) >> 1
+		current := tq.data[parent]
+		if tq.compare(item, current) >= 0 {
+			break
+		}
+		tq.data[pos] = current
+		pos = parent
+	}
+	tq.data[pos] = item
+}
+
+func (tq *TinyQueueAI) down(pos int) {
+	length := len(tq.data) - 1
+	halfLength := length >> 1
+	item := tq.data[pos]
+	for pos < halfLength {
+		left := (pos << 1) + 1
+		right := left + 1
+		best := tq.data[left]
+		if right < length && tq.compare(tq.data[right], best) < 0 {
+			left = right
+			best = tq.data[right]
+		}
+		if tq.compare(best, item) >= 0 {
+			break
+		}
+		tq.data[pos] = best
+		pos = left
+	}
+	tq.data[pos] = item
 }

@@ -46,8 +46,8 @@ func NewSplayTree(comparator Comparator) *SplayTree {
 
 // Insert Inserts a key, allows duplicates
 func (tree *SplayTree) Insert(node *Node) *Node {
-	tree.Size++
 	tree.Root = insert(node.Key, nil, tree.Root, tree.Comparator)
+	tree.Size++
 	return tree.Root
 }
 

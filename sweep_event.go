@@ -1,21 +1,5 @@
 package martinez_go
 
-type SweepEvent struct {
-	Point            Point
-	Left             bool
-	OtherEvent       *SweepEvent
-	IsSubject        bool
-	Type             int
-	InOut            bool
-	OtherInOut       bool
-	PrevInResult     *SweepEvent
-	ResultTransition int
-	OtherPos         int
-	OutputContourId  int
-	IsExteriorRing   bool
-	ContourId        int
-}
-
 func NewSweepEvent(point Point, left bool, otherEvent *SweepEvent, isSubject bool, edgeType int) *SweepEvent {
 	return &SweepEvent{
 		Point:            point,

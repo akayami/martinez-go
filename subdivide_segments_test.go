@@ -19,7 +19,7 @@ func TestSubdivideSegments(t *testing.T) {
 		q.Push(se1)
 		q.Push(se2)
 
-		iter, _ := SegmentIntersection(se1.Point, se1.OtherEvent.Point, se2.Point, se2.OtherEvent.Point, false)
+		iter := SegmentIntersection(se1.Point, se1.OtherEvent.Point, se2.Point, se2.OtherEvent.Point, false)
 
 		DivideSegment(se1, iter[0], q)
 		DivideSegment(se2, iter[0], q)
