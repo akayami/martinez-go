@@ -26,8 +26,14 @@ func ComputeFields(event, prev *SweepEvent, operation int) {
 			event.InOut = !prev.InOut
 			event.OtherInOut = prev.OtherInOut
 		} else {
+			// previous line segment in sweepline belongs to the clipping polygon
 			event.InOut = !prev.OtherInOut
-			event.OtherInOut = !prev.IsVertical() && prev.InOut
+			if prev.IsVertical() {
+				event.OtherInOut = !prev.InOut
+			} else {
+				event.OtherInOut = prev.InOut
+			}
+			// event.OtherInOut = !prev.IsVertical() && prev.InOut
 		}
 
 		if prev != nil {
@@ -38,8 +44,8 @@ func ComputeFields(event, prev *SweepEvent, operation int) {
 			}
 		}
 	}
-
-	if InResult(event, operation) {
+	inResult := InResult(event, operation)
+	if inResult {
 		event.ResultTransition = DetermineResultTransition(event, operation)
 	} else {
 		event.ResultTransition = 0
@@ -56,10 +62,7 @@ func InResult(event *SweepEvent, operation int) bool {
 		case Union:
 			return event.OtherInOut
 		case Difference:
-			if event.IsSubject {
-				return event.OtherInOut
-			}
-			return !event.OtherInOut
+			return (event.IsSubject && event.OtherInOut) || (!event.IsSubject && !event.OtherInOut)
 		case XOR:
 			return true
 		}

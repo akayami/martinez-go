@@ -1,30 +1,41 @@
 package martinez_go
 
 func OrderEvents(sortedEvents []*SweepEvent) []*SweepEvent {
-	var resultEvents []*SweepEvent
+	var tmp *SweepEvent
+	resultEvents := make([]*SweepEvent, 0)
+
+	// Filter events based on given conditions
 	for _, event := range sortedEvents {
 		if (event.Left && event.InResult()) || (!event.Left && event.OtherEvent.InResult()) {
 			resultEvents = append(resultEvents, event)
 		}
 	}
 
-	// Sort resultEvents if necessary
+	// Bubble sort algorithm to ensure total sorting of resultEvents
 	sorted := false
 	for !sorted {
 		sorted = true
 		for i := 0; i < len(resultEvents)-1; i++ {
 			if CompareEvents(resultEvents[i], resultEvents[i+1]) == 1 {
-				resultEvents[i], resultEvents[i+1] = resultEvents[i+1], resultEvents[i]
+				tmp = resultEvents[i]
+				resultEvents[i] = resultEvents[i+1]
+				resultEvents[i+1] = tmp
 				sorted = false
 			}
 		}
 	}
 
-	// Update otherPos
+	// Update otherPos for each event
 	for i, event := range resultEvents {
 		event.OtherPos = i
+	}
+
+	// Adjust otherPos for events where the left counterpart is not marked yet
+	for _, event := range resultEvents {
 		if !event.Left {
-			event.OtherPos, event.OtherEvent.OtherPos = event.OtherEvent.OtherPos, event.OtherPos
+			tmpPos := event.OtherPos
+			event.OtherPos = event.OtherEvent.OtherPos
+			event.OtherEvent.OtherPos = tmpPos
 		}
 	}
 
@@ -34,21 +45,51 @@ func OrderEvents(sortedEvents []*SweepEvent) []*SweepEvent {
 func NextPos(pos int, resultEvents []*SweepEvent, processed map[int]bool, origPos int) int {
 	newPos := pos + 1
 	length := len(resultEvents)
+	var p, p1 Point
 
-	for newPos < length && resultEvents[newPos].Point.Equals(resultEvents[pos].Point) {
+	if newPos < length {
+		p = resultEvents[pos].Point
+		p1 = resultEvents[newPos].Point
+	}
+
+	for newPos < length && p1.X == p.X && p1.Y == p.Y {
 		if !processed[newPos] {
 			return newPos
+		} else {
+			newPos++
+			if newPos < length {
+				p1 = resultEvents[newPos].Point
+			}
 		}
-		newPos++
 	}
 
 	newPos = pos - 1
+
 	for newPos > origPos && processed[newPos] {
 		newPos--
 	}
 
 	return newPos
 }
+
+// func NextPos2(pos int, resultEvents []*SweepEvent, processed map[int]bool, origPos int) int {
+// 	newPos := pos + 1
+// 	length := len(resultEvents)
+//
+// 	for newPos < length && resultEvents[newPos].Point.Equals(resultEvents[pos].Point) {
+// 		if !processed[newPos] {
+// 			return newPos
+// 		}
+// 		newPos++
+// 	}
+//
+// 	newPos = pos - 1
+// 	for newPos > origPos && processed[newPos] {
+// 		newPos--
+// 	}
+//
+// 	return newPos
+// }
 
 // 	}
 //

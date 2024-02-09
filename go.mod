@@ -3,9 +3,9 @@ module github.com/akayami/martinez-go
 go 1.21.6
 
 require (
+	github.com/engelsjk/polygol v0.0.3
 	github.com/paulmach/orb v0.11.1
 	github.com/stretchr/testify v1.8.4
-	github.com/twpayne/go-geom v1.5.3
 )
 
 require (
