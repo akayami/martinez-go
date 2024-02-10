@@ -91,9 +91,9 @@ func TestGeneric(t *testing.T) {
 							realOp := getOp(op)
 							var res [][][]Point
 							if realOp >= 0 {
-								res = Boolean(p1Geometry, p2Geometry, realOp)
+								res = Compute(p1Geometry, p2Geometry, realOp)
 							} else if realOp == -1 {
-								res = Boolean(p2Geometry, p1Geometry, Difference)
+								res = Compute(p2Geometry, p1Geometry, Difference)
 							}
 							expected := TranslateMultiPolygon(result.Polygon)
 							assert.Equal(t, expected, res)

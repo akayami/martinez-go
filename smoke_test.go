@@ -76,7 +76,7 @@ func TestEntryPointArea(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res := Boolean(subject, clipping, test.op)
+			res := Compute(subject, clipping, test.op)
 			assert.Equal(t, test.result, res)
 		})
 	}

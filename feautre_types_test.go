@@ -43,7 +43,7 @@ func TestScenarios(t *testing.T) {
 				t.Run(fmt.Sprintf("%s -> %s", ts.testName, op.dirname), func(t *testing.T) {
 					expectedIntResult, err := loadGeoJSON(filepath.Join(outDir, op.dirname, ts.testName+".geojson"))
 					assert.Nil(t, err)
-					intResult := Boolean(subject, clipping, op.op)
+					intResult := Compute(subject, clipping, op.op)
 					assert.Equal(t, expectedIntResult, intResult)
 				})
 			}

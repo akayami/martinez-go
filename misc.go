@@ -42,8 +42,8 @@ func CompareBBoxes(subject, clipping [][][]Point, sbbox, cbbox [4]float64, opera
 	return nil
 }
 
-// // Boolean performs the Boolean operation on two polygon sets.
-func Boolean(subject, clipping [][][]Point, operation int) [][][]Point {
+// // Compute performs the Compute operation on two polygon sets.
+func Compute(subject, clipping [][][]Point, operation int) [][][]Point {
 	// Ensure subject and clipping are in the correct format
 	// This step is specific to JavaScript's handling of arrays and might not be necessary in Go
 
