@@ -24,10 +24,11 @@ func TestEntryPointArea(t *testing.T) {
 	}}}
 
 	tests := []struct {
+		name   string
 		op     int
 		result [][][]Point
 	}{
-		{Union, [][][]Point{{{
+		{"Union:", Union, [][][]Point{{{
 			Point{0, 0},
 			Point{10, 0},
 			Point{10, 5},
@@ -38,14 +39,14 @@ func TestEntryPointArea(t *testing.T) {
 			Point{0, 10},
 			Point{0, 0},
 		}}}},
-		{Intersection, [][][]Point{{{
+		{"Intersection", Intersection, [][][]Point{{{
 			Point{5, 5},
 			Point{10, 5},
 			Point{10, 10},
 			Point{5, 10},
 			Point{5, 5},
 		}}}},
-		{Difference, [][][]Point{{{
+		{"Diff", Difference, [][][]Point{{{
 			Point{0, 0},
 			Point{10, 0},
 			Point{10, 5},
@@ -54,7 +55,7 @@ func TestEntryPointArea(t *testing.T) {
 			Point{0, 10},
 			Point{0, 0},
 		}}}},
-		{XOR, [][][]Point{{{
+		{"XOR", XOR, [][][]Point{{{
 			Point{0, 0},
 			Point{10, 0},
 			Point{10, 5},
@@ -62,7 +63,7 @@ func TestEntryPointArea(t *testing.T) {
 			Point{5, 10},
 			Point{0, 10},
 			Point{0, 0},
-		}, {
+		}}, {{
 			Point{5, 10},
 			Point{10, 10},
 			Point{10, 5},
@@ -74,7 +75,9 @@ func TestEntryPointArea(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		res := Boolean(subject, clipping, test.op)
-		assert.Equal(t, test.result, res)
+		t.Run(test.name, func(t *testing.T) {
+			res := Boolean(subject, clipping, test.op)
+			assert.Equal(t, test.result, res)
+		})
 	}
 }
