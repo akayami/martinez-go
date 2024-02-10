@@ -14,15 +14,6 @@ import (
 
 func TestGeneric(t *testing.T) {
 
-	// Assuming geometric operations are defined in the martinez package
-	// var operations = map[string]func(p1, p2 [][]float64) ([][]float64, error){
-	// 	"union":        Union,
-	// 	"intersection": Intersection,
-	// 	"xor":          XOR,
-	// 	"diff":         Difference,
-	// 	// "diff_ba" could be implemented as needed
-	// }
-
 	type Feature struct {
 		Geometry struct {
 			Type        string        `json:"type"`
